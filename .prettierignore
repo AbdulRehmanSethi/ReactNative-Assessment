@@ -1,0 +1,6 @@
+# Native projects are committed for a buildable bare-workflow repo, but their generated
+# Gradle/Xcode/CMake artifacts and asset catalogs aren't JS/TS source — Prettier has no business
+# formatting them, and without this file it would (Prettier auto-follows .gitignore, which no
+# longer excludes these folders wholesale).
+android/
+ios/

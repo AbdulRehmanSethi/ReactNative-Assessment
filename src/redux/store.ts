@@ -14,7 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
-import authReducer from '~/redux/auth/authSlice';
+import authReducer, { AuthState } from '~/redux/auth/authSlice';
 import rideReducer, { RideState } from '~/redux/ride/rideSlice';
 import driverReducer from '~/redux/driver/driverSlice';
 
@@ -25,6 +25,22 @@ const rootReducer = combineReducers({
 });
 
 type CombinedState = ReturnType<typeof rootReducer>;
+
+// Only the session (`user`) and an interrupted-registration marker (`pendingUid`/`pendingPhone`,
+// used by AuthStack to resume straight into Register) survive a restart. `status`/`error`/
+// `registrationProgress` are transient async-lifecycle state tied to a specific in-flight action —
+// persisting them meant a failed attempt's error banner stayed stuck forever, reappearing on every
+// launch even after killing and reopening the app, since it was never a real in-flight failure by
+// then, just stale rehydrated state.
+const authTransform = createTransform<AuthState, Partial<AuthState>>(
+  (inboundState) => ({
+    user: inboundState.user,
+    pendingUid: inboundState.pendingUid,
+    pendingPhone: inboundState.pendingPhone,
+  }),
+  (outboundState) => outboundState as AuthState,
+  { whitelist: ['auth'] }
+);
 
 // Only `activeRideId` survives a restart — everything else in `ride` (drafts, negotiation
 // state, quotes) is session-only and starts fresh on every launch, exactly as before. This is
@@ -42,12 +58,12 @@ const persistConfig: PersistConfig<CombinedState> = {
   key: 'root',
   storage: AsyncStorage,
   whitelist: ['auth', 'ride'],
-  transforms: [rideTransform],
+  transforms: [authTransform, rideTransform],
   // The default reconciler (autoMergeLevel1) hard-replaces a whitelisted slice's entire state
-  // with whatever was persisted — since `ride` only ever persists `{activeRideId}`, that wiped
-  // out `draft`/`currentRequest`/`quotes`/etc. on every rehydration. Level2 shallow-merges one
-  // level deeper, so the persisted `activeRideId` overlays the reducer's own defaults instead of
-  // replacing them.
+  // with whatever was persisted — since `ride`/`auth` only ever persist a handful of fields, that
+  // wiped out the rest (`draft`/`currentRequest`/`quotes`/etc., or `status`/`error`) on every
+  // rehydration. Level2 shallow-merges one level deeper, so the persisted fields overlay the
+  // reducer's own defaults instead of replacing them.
   stateReconciler: autoMergeLevel2,
 };
 

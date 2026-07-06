@@ -123,9 +123,11 @@ export const submitRegistration = createAsyncThunk<User, SimpleRegistrationPaylo
         role: 'partner',
         fullName: payload.fullName,
         cnic: payload.cnic ?? '',
-        email: payload.email?.trim() || undefined,
         profilePhotoKey,
         status: 'active',
+        // Firestore's .set() throws on a field explicitly valued `undefined` (unlike `null`),
+        // so the key must be omitted entirely rather than set to undefined when no email is given.
+        ...(payload.email?.trim() ? { email: payload.email.trim() } : {}),
       };
     }
 
