@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+
+# Expo / Metro
+.expo/
+.metro-health-check*
+dist/
+web-build/
+
+# Native projects are committed (bare workflow) — only generated/build output below is ignored.
+
+# Android generated/build output
+android/build/
+android/app/build/
+android/app/release/
+android/.gradle/
+android/.cxx/
+android/local.properties
+*.hprof
+
+# Android/IntelliJ
+.idea/
+*.iml
+*.keystore
+!debug.keystore
+
+# iOS generated/build output (CocoaPods + Xcode)
+ios/Pods/
+ios/build/
+ios/DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+project.xcworkspace
+
+# Xcode project user files (keep the shared defaults)
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Carthage
+/Carthage/Build/
+/Carthage/Checkouts/
+
+# Bundle artifacts
+*.jsbundle
+
+# Firebase credentials — add your own (see README) before building
+google-services.json
+GoogleService-Info.plist
+
+# Signing / certificates — never commit these
+# *.jks intentionally left trackable (uncomment to ignore release keystores)
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Env
+.env
+
+# This project uses Yarn — avoid a second lockfile
+package-lock.json
+
+# Logs
+npm-debug.*
+yarn-error.log
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/.react/
